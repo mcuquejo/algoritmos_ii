@@ -46,8 +46,6 @@ void pruebas_pila_apilar_algunos_elementos(){
     print_test("Pila 2: El tope de la pila es NULL", pila_ver_tope(pila_2) == &valor4);
     print_test("Pila 2: Permite desapilar un NULL", pila_desapilar(pila_2));
     print_test("Pila 2: El tope de la pila es NULL", pila_ver_tope(pila_2) == &valor3);
-    
-    /*se destruye pila antes de eliminar ultimo elemento, para verificar que libere memoria correctamente. */
     pila_destruir(pila_2);
     print_test("Pila 2: Destruida correctamente (se deja un elemento apilado para verificar por valgrind que no se pierda memoria)", true);    
 }
@@ -64,19 +62,16 @@ void pruebas_pila_volumen(){
     }
     print_test("Pila 3: Se pudieron apilar todos los elementos correctamente", resultado_exitoso);
     print_test("Pila 3: El tope de la pila 3 es correcto", pila_ver_tope(pila_3) == &vector[cant_pila-1]);    
-    
     resultado_exitoso = true;
     for (int i = 0; i < cant_pila; i++){
         resultado_exitoso &= (pila_desapilar(pila_3) == NULL)? false : true;
         }
-    print_test("Pila 3: se pudieron desapilar todos los elementos correctamente", resultado_exitoso);
-    
+    print_test("Pila 3: se pudieron desapilar todos los elementos correctamente", resultado_exitoso);    
     resultado_exitoso = true;
     for (int i = 0; i < cant_pila; i++){
         resultado_exitoso &= pila_esta_vacia(pila_3);
     }
-    print_test("Pila 3: No permite desapilar la pila estando vacia (se realizaron numerosos intentos)", resultado_exitoso);
-    
+    print_test("Pila 3: No permite desapilar la pila estando vacia (se realizaron numerosos intentos)", resultado_exitoso);    
     pila_destruir(pila_3);
     print_test("Pila 3: Destruida correctamente", true);
 }
