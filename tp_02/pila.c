@@ -9,32 +9,30 @@ struct pila {
     size_t capacidad;  // Capacidad del arreglo 'datos'.
 };
 
-//typedef struct pila pila_t;
-
 /* *****************************************************************
  *                    PRIMITIVAS DE LA PILA
  * *****************************************************************/
- // Crea una pila.
+// Crea una pila.
 // Post: devuelve una nueva pila vacía.
 pila_t* pila_crear(void) {
-	pila_t* pila = malloc(sizeof(*pila));
-	if (pila == NULL) {
-		return NULL;
-	}
-	pila->cantidad = 0;
-	pila->capacidad = 2;
-	pila->datos = malloc(pila->capacidad * sizeof(*pila->datos));
-	if (pila->datos == NULL) {
-		return NULL;
-	}
-	return pila;	
+    pila_t* pila = malloc(sizeof(*pila));
+    if (pila == NULL) {
+        return NULL;
+    }
+    pila->cantidad = 0;
+    pila->capacidad = 2;
+    pila->datos = malloc(pila->capacidad * sizeof(*pila->datos));
+    if (pila->datos == NULL) {
+        return NULL;
+    }
+    return pila;
 }
 
 // Destruye la pila.
 // Pre: la pila fue creada.
 // Post: se eliminaron todos los elementos de la pila.
-void pila_destruir(pila_t *pila){
-	if (pila->datos != NULL) {
+void pila_destruir(pila_t *pila) {
+    if (pila->datos != NULL) {
         free(pila->datos);
     }
     free(pila);
@@ -42,26 +40,26 @@ void pila_destruir(pila_t *pila){
 
 // Devuelve verdadero si la pila no tiene elementos apilados, false en caso contrario.
 // Pre: la pila fue creada.
-bool pila_esta_vacia(const pila_t *pila){
-	return (pila->cantidad == 0);
+bool pila_esta_vacia(const pila_t *pila) {
+    return (pila->cantidad == 0);
 }
 
 // Agrega un nuevo elemento a la pila. Devuelve falso en caso de error.
 // Pre: la pila fue creada.
 // Post: se agregó un nuevo elemento a la pila, valor es el nuevo tope.
-bool pila_apilar(pila_t *pila, void* valor){	
-	pila->datos[pila->cantidad] = valor;
-	pila->cantidad++;
-	if (pila->cantidad == pila->capacidad){
-		size_t tam_nuevo = pila->capacidad * 2;
-		void** datos_nuevo = realloc(pila->datos, tam_nuevo * sizeof(pila->datos));
-		if(datos_nuevo == NULL){
-			return false;
-		}
-		pila->capacidad = tam_nuevo;
-		pila->datos = datos_nuevo;
-	}
-	return true;
+bool pila_apilar(pila_t *pila, void* valor) {
+    pila->datos[pila->cantidad] = valor;
+    pila->cantidad++;
+    if (pila->cantidad == pila->capacidad) {
+        size_t tam_nuevo = pila->capacidad * 2;
+        void** datos_nuevo = realloc(pila->datos, tam_nuevo * sizeof(pila->datos));
+        if(datos_nuevo == NULL) {
+            return false;
+        }
+        pila->capacidad = tam_nuevo;
+        pila->datos = datos_nuevo;
+    }
+    return true;
 }
 
 // Obtiene el valor del tope de la pila. Si la pila tiene elementos,
@@ -69,11 +67,11 @@ bool pila_apilar(pila_t *pila, void* valor){
 // Pre: la pila fue creada.
 // Post: se devolvió el valor del tope de la pila, cuando la pila no está
 // vacía, NULL en caso contrario.
-void* pila_ver_tope(const pila_t *pila){
-	if (pila_esta_vacia(pila)){
-		return NULL;
-	}
-	return pila->datos[pila->cantidad-1];
+void* pila_ver_tope(const pila_t *pila) {
+    if (pila_esta_vacia(pila)) {
+        return NULL;
+    }
+    return pila->datos[pila->cantidad-1];
 }
 
 // Saca el elemento tope de la pila. Si la pila tiene elementos, se quita el
@@ -82,20 +80,20 @@ void* pila_ver_tope(const pila_t *pila){
 // Pre: la pila fue creada.
 // Post: si la pila no estaba vacía, se devuelve el valor del tope anterior
 // y la pila contiene un elemento menos.
-void* pila_desapilar(pila_t *pila){
-	if (pila_esta_vacia(pila)){
-		return NULL;
-	}
-	void* valor = pila_ver_tope(pila);
-	pila->cantidad--;
-	if(pila->cantidad*4 <= pila->capacidad){		
-		size_t tam_nuevo = pila->capacidad/2;
-		void** datos_nuevo = realloc(pila->datos, tam_nuevo * sizeof(pila->datos));
-		if(datos_nuevo == NULL){
-			return false;
-		}	
-		pila->capacidad = tam_nuevo;
-		pila->datos = datos_nuevo;
-	}
-	return valor;
+void* pila_desapilar(pila_t *pila) {
+    if (pila_esta_vacia(pila)) {
+        return NULL;
+    }
+    void* valor = pila_ver_tope(pila);
+    pila->cantidad--;
+    if(pila->cantidad*4 <= pila->capacidad) {
+        size_t tam_nuevo = pila->capacidad/2;
+        void** datos_nuevo = realloc(pila->datos, tam_nuevo * sizeof(pila->datos));
+        if(datos_nuevo == NULL) {
+            return false;
+        }
+        pila->capacidad = tam_nuevo;
+        pila->datos = datos_nuevo;
+    }
+    return valor;
 }

@@ -1,7 +1,6 @@
 #include "pila.h"
 #include "testing.h"
 #include <stddef.h>
-#include <stdio.h>
 
 
 /* ******************************************************************
@@ -9,7 +8,7 @@
  * *****************************************************************/
 /* Pruebas para una pila nula. */
 void pruebas_pila_nula(){
-	pila_t* ejemplo = NULL;
+    pila_t* ejemplo = NULL;
     print_test("Puntero inicializado a NULL", ejemplo == NULL);
 }
 
@@ -39,18 +38,18 @@ void pruebas_pila_apilar_algunos_elementos(){
     print_test("Pila 2: Permite desapilar un int", pila_desapilar(pila_2));
     print_test("Pila 2: Si esta vacia no tiene tope", pila_ver_tope(pila_2) == NULL);
     print_test("Pila 2: Si esta vacia no se puede desapilar", pila_desapilar(pila_2) == NULL);
-	int* valor3 = NULL;
-	print_test("Pila 2: Permite apilar un NULL", pila_apilar(pila_2, &valor3));
+    int* valor3 = NULL;
+    print_test("Pila 2: Permite apilar un NULL", pila_apilar(pila_2, &valor3));
     print_test("Pila 2: El tope de la pila es NULL", pila_ver_tope(pila_2) == &valor3);
-	int* valor4 = NULL;
+    int* valor4 = NULL;
     print_test("Pila 2: Permite apilar un NULL", pila_apilar(pila_2, &valor4));
     print_test("Pila 2: El tope de la pila es NULL", pila_ver_tope(pila_2) == &valor4);
-	print_test("Pila 2: Permite desapilar un NULL", pila_desapilar(pila_2));
-	print_test("Pila 2: El tope de la pila es NULL", pila_ver_tope(pila_2) == &valor3);
+    print_test("Pila 2: Permite desapilar un NULL", pila_desapilar(pila_2));
+    print_test("Pila 2: El tope de la pila es NULL", pila_ver_tope(pila_2) == &valor3);
     
     /*se destruye pila antes de eliminar ultimo elemento, para verificar que libere memoria correctamente. */
     pila_destruir(pila_2);
-    print_test("Pila 2: Destruida correctamente", true);    
+    print_test("Pila 2: Destruida correctamente (se deja un elemento apilado para verificar por valgrind que no se pierda memoria)", true);    
 }
 
 /* Pruebas de pila con un volumen grande de elementos */
