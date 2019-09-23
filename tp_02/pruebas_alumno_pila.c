@@ -1,6 +1,7 @@
 #include "pila.h"
 #include "testing.h"
 #include <stddef.h>
+#define CANT_APILAR 100000
 
 
 /* ******************************************************************
@@ -52,7 +53,7 @@ void pruebas_pila_apilar_algunos_elementos(){
 
 /* Pruebas de pila con un volumen grande de elementos */
 void pruebas_pila_volumen(){
-    size_t cant_pila = 100000;    
+    size_t cant_pila = CANT_APILAR;    
     pila_t* pila_3 = pila_crear();
     print_test("Pila 3: Creada correctamente", pila_3 != NULL);    
     int vector[cant_pila];

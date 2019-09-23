@@ -1,5 +1,7 @@
 #include "pila.h"
 #include <stdlib.h>
+#define CAPACIDAD_INICIAL 2
+#define TAM_REDIMENSION 2
 
 /* Definición del struct pila proporcionado por la cátedra.
  */
@@ -18,9 +20,10 @@ pila_t* pila_crear(void) {
         return NULL;
     }
     pila->cantidad = 0;
-    pila->capacidad = 2;
+    pila->capacidad = CAPACIDAD_INICIAL;
     pila->datos = malloc(pila->capacidad * sizeof(*pila->datos));
     if (pila->datos == NULL) {
+        free(pila);
         return NULL;
     }
     return pila;
@@ -37,17 +40,25 @@ bool pila_esta_vacia(const pila_t *pila) {
     return (pila->cantidad == 0);
 }
 
+bool pila_redimensionar(pila_t* pila, bool aumentar_tam){
+    size_t tam_nuevo = aumentar_tam ? pila->capacidad * TAM_REDIMENSION : pila->capacidad / 2;
+    void** datos_nuevo = realloc(pila->datos, tam_nuevo * sizeof(pila->datos));
+    if(datos_nuevo == NULL) {
+        return false;
+    }
+    pila->capacidad = tam_nuevo;
+    pila->datos = datos_nuevo;
+    return true;
+}
+
 bool pila_apilar(pila_t *pila, void* valor) {
     pila->datos[pila->cantidad] = valor;
     pila->cantidad++;
     if (pila->cantidad == pila->capacidad) {
-        size_t tam_nuevo = pila->capacidad * 2;
-        void** datos_nuevo = realloc(pila->datos, tam_nuevo * sizeof(pila->datos));
-        if(datos_nuevo == NULL) {
-            return false;
+       bool redimension_ok = pila_redimensionar(pila, true);
+       if (!redimension_ok) {
+           return false;
         }
-        pila->capacidad = tam_nuevo;
-        pila->datos = datos_nuevo;
     }
     return true;
 }
@@ -65,14 +76,11 @@ void* pila_desapilar(pila_t *pila) {
     }
     void* valor = pila_ver_tope(pila);
     pila->cantidad--;
-    if(pila->cantidad*4 <= pila->capacidad) {
-        size_t tam_nuevo = pila->capacidad/2;
-        void** datos_nuevo = realloc(pila->datos, tam_nuevo * sizeof(pila->datos));
-        if(datos_nuevo == NULL) {
-            return false;
+    if(pila->cantidad * 4 <= pila->capacidad) {
+        bool redimension_ok = pila_redimensionar(pila, false);
+       if (!redimension_ok) {
+           return false;
         }
-        pila->capacidad = tam_nuevo;
-        pila->datos = datos_nuevo;
     }
     return valor;
 }
