@@ -133,7 +133,7 @@ void pruebas_vector_volumen() {
     bool ok = true;
     for (i = 0; i < tam; i++) {
         // Si algun elemento no se pudo guardar correctamente, ok sera false
-        ok &= vector_guardar(vec_vol, i, (int) i);
+        ok = vector_guardar(vec_vol, i, (int) i);
     }
     print_test("se pudieron guardar todos los elementos", ok);
     print_test("no se puede guardar un elemento en vec_vol[tam]", !vector_guardar(vec_vol, tam, 10));
