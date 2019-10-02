@@ -1,5 +1,5 @@
-#include "lista.h"
 #include <stdio.h>
+#include "lista.h"
 
 //
 // Imprimir una lista con iterador externo
