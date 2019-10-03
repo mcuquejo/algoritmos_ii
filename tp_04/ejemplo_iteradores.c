@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "ejemplo_iteradores.h"
 #include "lista.h"
 
 //
