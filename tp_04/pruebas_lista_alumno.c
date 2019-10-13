@@ -3,13 +3,7 @@
 #include <stdlib.h>
 #include "lista.h"
 #define CANT_ELEMENTOS 100000
-
-void pruebas_lista_nula() {
-    lista_t* ejemplo = NULL;
-    print_test("Puntero inicializado a NULL", ejemplo == NULL);
-}
-
-/* Pruebas para una lista vacia */
+                                                                               
 void pruebas_lista_vacia() {
     lista_t* lista_1 = lista_crear();
     print_test("Lista 1: Creada correctamente", lista_1 != NULL);
@@ -21,7 +15,6 @@ void pruebas_lista_vacia() {
     print_test("Lista 1: Destruida correctamente", true);
 }
 
-/* Pruebas guardando algunos elementos en la lista. */
 void pruebas_lista_insertar_algunos_elementos() {
     lista_t* lista_2 = lista_crear();
     print_test("Lista 2: Creada correctamente", lista_2 != NULL);
@@ -57,7 +50,6 @@ void destruir_datos(void* elemento) {
     lista_destruir((lista_t*) elemento, NULL);
 }
 
-/*pruebas guardando elementos que hayan solicitado memoria dinamica*/
 void pruebas_lista_insertar_con_malloc() {
     int* p_entero_1 = malloc(sizeof(int));
     *p_entero_1 = 5;    
@@ -82,13 +74,16 @@ void pruebas_lista_insertar_con_malloc() {
     print_test("Lista 3: Si esta vacia no tiene primer elemento", lista_ver_primero(lista_3) == NULL);
     print_test("Lista 3: Si esta vacia no tiene ultimo elemento", lista_ver_ultimo(lista_3) == NULL);
     print_test("Lista 3: Si esta vacia no se puede borrar un elemento", lista_borrar_primero(lista_3) == NULL);
-    lista_destruir(lista_3,NULL);
+    lista_destruir(lista_3,NULL);    
     print_test("Lista 3: Destruida correctamente (Parametro en NULL porque la lista no tenia elementos en memoria dinámica)", true);
-    lista_3 = lista_crear();
+}    
+    
+void prueba_insertar_con_malloc_func_destruir() {   
+    lista_t* lista_3 = lista_crear();
     print_test("Lista 3: Creada correctamente por segunda vez", lista_3 != NULL);  
-    p_entero_1 = malloc(sizeof(int));
+    int* p_entero_1 = malloc(sizeof(int));
     *p_entero_1 = 5;
-    p_char_1 = malloc(sizeof(char));
+    char* p_char_1 = malloc(sizeof(char));
     *p_char_1 = 'a';
     print_test("Lista 3: Permite insertar primero un int (pruebas memoria dinamica)", lista_insertar_primero(lista_3, p_entero_1));
     print_test("Lista 3: Permite insertar primero un char (pruebas memoria dinamica)", lista_insertar_primero(lista_3, p_char_1));
@@ -114,7 +109,6 @@ void pruebas_lista_insertar_con_malloc() {
     print_test("Lista 3: Destruida correctamente (Parametro funcion destruir_datos() porque la lista tenia un elemento de tipo lista en memoria dinámica)", true);   
 }
 
-/* Pruebas de lista con un volumen grande de elementos */
 void pruebas_lista_volumen() {
     size_t cant_lista = CANT_ELEMENTOS;    
     lista_t* lista_4 = lista_crear();
@@ -219,11 +213,15 @@ void pruebas_lista_iterador_externo() {
     print_test("Lista 5: La lista aún sigue en memoria, pese a eliminar el iterador:", lista_5 != NULL);
     lista_destruir(lista_5, NULL);
     print_test("Lista 5: Destruida correctamente con parametro NULL, ya que no habia elementos en Heap", true);
+}
     
+    
+    
+void pruebas_lista_iterador_externo2() {    
     lista_t* lista_6 = lista_crear();
     print_test("Lista 6: Creada correctamente", lista_6 != NULL);
     lista_iter_t* iter5 = lista_iter_crear(lista_6);
-    print_test("Iterador 5 Lista 6: Creado correctamente", iter != NULL); 
+    print_test("Iterador 5 Lista 6: Creado correctamente", iter5 != NULL); 
     char* dato4 = "prueba";
     lista_iter_insertar(iter5, &dato4);
     print_test("Iterador 5 Lista 6: El elemento de la lista 6 se insertó correctamente estando la lista vacía", lista_iter_ver_actual(iter5) == &dato4);
@@ -255,41 +253,37 @@ void pruebas_lista_iterador_externo() {
     lista_destruir(lista_6, NULL);
     print_test("Lista 6: Destruida correctamente con parametro NULL, ya que no habia elementos en Heap", true);
     
+}
+
+void pruebas_lista_iterador_externo3() {
     lista_t* lista_7 = lista_crear();
     print_test("Lista 7: Creada correctamente", lista_7 != NULL);
     int dato8 = 0;
     int dato9 = 1;
-//     int dato10 = 2;
+    int dato10 = 2;
     lista_insertar_ultimo(lista_7, &dato8);
     lista_insertar_ultimo(lista_7, &dato9);
-    //lista_insertar_ultimo(lista_7, &dato10);
-    
+    lista_insertar_ultimo(lista_7, &dato10);    
     lista_iter_t* iter6 = lista_iter_crear(lista_7);
-    print_test("Iterador 6 Lista 7: Creado correctamente", iter != NULL);
-    
+    print_test("Iterador 6 Lista 7: Creado correctamente", iter6 != NULL);    
     lista_iter_avanzar(iter6);
-    lista_iter_borrar(iter6);
-//     lista_iter_borrar(iter6);
-//     lista_iter_avanzar(iter6);
-//     lista_iter_borrar(iter6);
-    
+    print_test("Iterador 6 Lista 7: Se avanza un nodo. El elemento actual, deberia ser 1", lista_iter_ver_actual(iter6) == &dato9);
+    print_test("Iterador 6 Lista 7: permitió borrar correctamente el elemento 1 de la lista", lista_iter_borrar(iter6) != NULL);
+    print_test("Iterador 6 Lista 7: permitió borrar correctamente el elemento 2 de la lista", lista_iter_borrar(iter6) != NULL);
+    print_test("Iterador 6 Lista 7: El iterador ahora se encuentra al final de la lista", lista_iter_al_final(iter6));    
+    print_test("Iterador 6 Lista 7: El iterador no puede avanzar estando al final de la lista", !lista_iter_avanzar(iter6));
+    print_test("Iterador 6 Lista 7: El iterador no puede borrar un elemento estando al final de la lista", !lista_iter_borrar(iter6));    
     lista_iter_destruir(iter6);    
-    print_test("Iterador 6 Lista 7: iterador 5 destruido correctamente", true);
-    
+    print_test("Iterador 6 Lista 7: Iterador 6 destruido correctamente", true);    
     lista_iter_t* iter7 = lista_iter_crear(lista_7);
-    print_test("Iterador 7 Lista 7: Creado correctamente", iter != NULL);
-    
-    printf("%p item actual antes de avanzar\n", lista_iter_ver_actual(iter7));
-    
+    print_test("Iterador 7 Lista 7: Iterador 7 Creado correctamente", iter7 != NULL);    
     lista_iter_avanzar(iter7);
-    printf("%p item actual despues de avanzar\n", lista_iter_ver_actual(iter7));
-    /*********************************************************************************/
+    print_test("Iterador 6 Lista 7: Se avanza un nodo. El elemento actual, el iterador ahora debería estar al final de la lista", lista_iter_al_final(iter7));
     lista_iter_destruir(iter7);    
-    print_test("Iterador 7 Lista 7: iterador 5 destruido correctamente", true);
+    print_test("Iterador 7 Lista 7: iterador 7 destruido correctamente", true);
     print_test("Lista 7: La lista aún sigue en memoria, pese a eliminar el iterador:", lista_7 != NULL);
     lista_destruir(lista_7, NULL);
     print_test("Lista 7: Destruida correctamente con parametro NULL, ya que no habia elementos en Heap", true);
-    
 }
 
 bool imprimir_todo(void* dato, void* extra) {
@@ -323,12 +317,14 @@ void pruebas_lista_iterador_interno() {
     lista_destruir(lista_7, NULL);
 }
 
-void pruebas_lista_alumno() {    
-//     pruebas_lista_nula();
-//     pruebas_lista_vacia();
-//     pruebas_lista_insertar_algunos_elementos();
-//     pruebas_lista_insertar_con_malloc();
-//     pruebas_lista_volumen();
+void pruebas_lista_alumno() {
+    pruebas_lista_vacia();
+    pruebas_lista_insertar_algunos_elementos();
+    pruebas_lista_insertar_con_malloc();
+    prueba_insertar_con_malloc_func_destruir();
+    pruebas_lista_volumen();
     pruebas_lista_iterador_externo();
-//     pruebas_lista_iterador_interno();
+    pruebas_lista_iterador_externo2();
+    pruebas_lista_iterador_externo3();
+    pruebas_lista_iterador_interno();
 }
