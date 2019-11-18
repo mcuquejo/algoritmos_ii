@@ -155,6 +155,8 @@ void *lista_iter_ver_actual(const lista_iter_t *iter){
 }
 
 void lista_iter_destruir(lista_iter_t *iter){
+    //iter->actual = NULL;
+    //iter->anterior = NULL;
     free(iter);
 }
 
