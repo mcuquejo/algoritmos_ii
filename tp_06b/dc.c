@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "lista.h"
+#include "pila.h"
 #include "strutil.h"
 #define RAIZ "sqrt"
 #define RAIZ_FINAL_LINEA "sqrt\n"
@@ -10,18 +10,16 @@
 #define LOG_FINAL_LINEA "log\n"
 enum estado {SUMA = 43, RESTA = 45, MULTIPLICACION = 42, DIVISION = 47, POTENCIA = 94, TERNARIO = 63};
 
-bool suma(lista_t* lista_operaciones) {
-    if (lista_largo(lista_operaciones) >= 2) {
-        char* p;
-        p = malloc(sizeof(int)); 
-        if(p == NULL) { 
-            return false;            
+bool suma(pila_t* pila_operaciones) {
+    if (pila_largo(pila_operaciones) >= 2) {
+        int* resultado = malloc(sizeof(int));
+        if(resultado == NULL) {
+            return false;
         }
-        void* a = lista_borrar_primero(lista_operaciones);
-        void* b = lista_borrar_primero(lista_operaciones);
-        int resultado = atoi(a) + atoi(b);
-        sprintf(p,"%d",resultado);
-        lista_insertar_primero(lista_operaciones, p);
+        int* a = pila_desapilar(pila_operaciones);
+        int* b = pila_desapilar(pila_operaciones);
+        *resultado = *a + *b;
+        pila_apilar(pila_operaciones, resultado);
         free(a);
         free(b);
     } else {
@@ -30,18 +28,16 @@ bool suma(lista_t* lista_operaciones) {
     return true;
 }
 
-bool resta(lista_t* lista_operaciones) {
-    if (lista_largo(lista_operaciones) >= 2) {
-        char* p;
-        p = malloc(sizeof(int)); 
-        if(p == NULL) { 
-            return false;            
+bool resta(pila_t* pila_operaciones) {
+    if (pila_largo(pila_operaciones) >= 2) {
+        int* resultado = malloc(sizeof(int));
+        if(resultado == NULL) {
+            return false;
         }
-        void* a = lista_borrar_primero(lista_operaciones);
-        void* b = lista_borrar_primero(lista_operaciones);
-        int resultado = atoi(a) - atoi(b);
-        sprintf(p,"%d",resultado);
-        lista_insertar_primero(lista_operaciones, p);
+        int* a = pila_desapilar(pila_operaciones);
+        int* b = pila_desapilar(pila_operaciones);
+        *resultado = *a - *b;
+        pila_apilar(pila_operaciones, resultado);
         free(a);
         free(b);
     } else {
@@ -50,34 +46,35 @@ bool resta(lista_t* lista_operaciones) {
     return true;
 }
 
-int calcular_potencia(int base, int e) {
-    if (e == 0) {
+int calcular_potencia(int base, int exponente) {
+    if (exponente == 0) {
         return 1;
     } else {
-        int resultado = calcular_potencia(base * base, e / 2);
-        if (e % 2 == 1) {
+        int resultado = calcular_potencia(base * base, exponente / 2);
+        if (exponente % 2 == 1) {
             resultado = base * resultado;
         }
         return resultado;
     }
 }
 
-bool potencia(lista_t* lista_operaciones) {
-    if (lista_largo(lista_operaciones) >= 2) {
-        char* p;
-        p = malloc(sizeof(int));
-        if(p == NULL) {
+bool potencia(pila_t* pila_operaciones) {
+    if (pila_largo(pila_operaciones) >= 2) {
+        int* resultado = malloc(sizeof(int));
+        if(resultado == NULL) {
             return false;
         }
-        void* a = lista_borrar_primero(lista_operaciones);
-        void* b = lista_borrar_primero(lista_operaciones);
-        if (atoi(a) > 0) {
-        int resultado = calcular_potencia(atoi(a), atoi(b));
-        sprintf(p,"%d",resultado);
-        lista_insertar_primero(lista_operaciones, p);
-        free(a);
-        free(b);
+        int* base = pila_desapilar(pila_operaciones);
+        int* exponente = pila_desapilar(pila_operaciones);
+        if (*exponente >= 0) {
+            *resultado = calcular_potencia(*base, *exponente);
+            pila_apilar(pila_operaciones, resultado);
+            free(base);
+            free(exponente);
         } else {
+            free(base);
+            free(exponente);
+            free(resultado);
             return false;
         }
     } else {
@@ -87,11 +84,13 @@ bool potencia(lista_t* lista_operaciones) {
 }
 
 int calcular_raiz(int radicando, int inicio, int fin) {
-    if ( inicio > fin) return 0;
+    if ( inicio > fin) {        
+        return inicio - 1;
+    }
     int medio = (inicio + fin) / 2;
     if (medio * medio == radicando || (medio * medio) + 1 == radicando) {
         return medio;
-    }    
+    }
     if (medio * medio > radicando) {
         return calcular_raiz(radicando, inicio, medio - 1);
     } else {
@@ -99,20 +98,20 @@ int calcular_raiz(int radicando, int inicio, int fin) {
     }
 }
 
-bool raiz(lista_t* lista_operaciones) {
-    if (lista_largo(lista_operaciones) >= 1) {
-        char* p;
-        p = malloc(sizeof(int));
-        if(p == NULL) {
+bool raiz(pila_t* pila_operaciones) {
+    if (pila_largo(pila_operaciones) >= 1) {
+        int* resultado = malloc(sizeof(int));
+        if(resultado == NULL) {
             return false;
         }
-        void* a = lista_borrar_primero(lista_operaciones);
-        if (atoi(a) > 0) {
-        int resultado = calcular_raiz(atoi(a), 1, atoi(a));
-        sprintf(p,"%d",resultado);
-        lista_insertar_primero(lista_operaciones, p);
-        free(a);
+        int* radicando = pila_desapilar(pila_operaciones);
+        if (*radicando >= 0) {
+            *resultado = calcular_raiz(*radicando, 1, *radicando);
+            pila_apilar(pila_operaciones, resultado);
+            free(radicando);
         } else {
+            free(radicando);
+            free(resultado);
             return false;
         }
     } else {
@@ -121,22 +120,23 @@ bool raiz(lista_t* lista_operaciones) {
     return true;
 }
 
-bool division(lista_t* lista_operaciones) {
-    if (lista_largo(lista_operaciones) >= 2) {
-        char* p;
-        p = malloc(sizeof(int));
-        if(p == NULL) {
+bool division(pila_t* pila_operaciones) {
+    if (pila_largo(pila_operaciones) >= 2) {
+        int* resultado = malloc(sizeof(int));
+        if(resultado == NULL) {
             return false;
         }
-        void* a = lista_borrar_primero(lista_operaciones);
-        void* b = lista_borrar_primero(lista_operaciones);
-        if (atoi(b) > 0) {
-            int resultado = atoi(a) / atoi(b);
-            sprintf(p,"%d",resultado);
-            lista_insertar_primero(lista_operaciones, p);
-            free(a);
-            free(b);
+        int* dividendo = pila_desapilar(pila_operaciones);
+        int* divisor = pila_desapilar(pila_operaciones);
+        if (*divisor != 0) {
+            *resultado = *dividendo / *divisor;
+            pila_apilar(pila_operaciones, resultado);
+            free(dividendo);
+            free(divisor);
         } else {
+            free(dividendo);
+            free(divisor);
+            free(resultado);
             return false;
         }
     } else {
@@ -145,20 +145,18 @@ bool division(lista_t* lista_operaciones) {
     return true;
 }
 
-bool multiplicacion(lista_t* lista_operaciones) {
-    if (lista_largo(lista_operaciones) >= 2) {
-        char* p;
-        p = malloc(sizeof(int));
-        if(p == NULL) {
+bool multiplicacion(pila_t* pila_operaciones) {
+    if (pila_largo(pila_operaciones) >= 2) {
+        int* resultado = malloc(sizeof(int));
+        if(resultado == NULL) {
             return false;
         }
-        void* a = lista_borrar_primero(lista_operaciones);
-        void* b = lista_borrar_primero(lista_operaciones);
-        int resultado = atoi(a) * atoi(b);
-        sprintf(p,"%d",resultado);
-        lista_insertar_primero(lista_operaciones, p);
-        free(a);
-        free(b);
+        int* multiplicando = pila_desapilar(pila_operaciones);
+        int* multipicador = pila_desapilar(pila_operaciones);
+        *resultado = *multiplicando * *multipicador;
+        pila_apilar(pila_operaciones, resultado);
+        free(multiplicando);
+        free(multipicador);
     } else {
         return false;
     }
@@ -172,22 +170,23 @@ int calcular_logaritmo(int base, int valor) {
     return calcular_logaritmo(base, valor / base) + 1;
 }
 
-bool logaritmo(lista_t* lista_operaciones) {
-    if (lista_largo(lista_operaciones) >= 2) {
-        char* p;
-        p = malloc(sizeof(int));
-        if(p == NULL) {
+bool logaritmo(pila_t* pila_operaciones) {
+    if (pila_largo(pila_operaciones) >= 2) {
+        int* resultado = malloc(sizeof(int));
+        if(resultado == NULL) {
             return false;
         }
-        void* a = lista_borrar_primero(lista_operaciones);
-        void* b = lista_borrar_primero(lista_operaciones);
-        if (atoi(b) > 1) {
-            int resultado = calcular_logaritmo(atoi(b), atoi(a));
-            sprintf(p,"%d",resultado);
-            lista_insertar_primero(lista_operaciones, p);
-            free(a);
-            free(b);
+        int* valor = pila_desapilar(pila_operaciones);
+        int* base = pila_desapilar(pila_operaciones);
+        if (*base > 1) {
+            *resultado = calcular_logaritmo(*base, *valor);
+            pila_apilar(pila_operaciones, resultado);
+            free(valor);
+            free(base);
         } else {
+            free(valor);
+            free(base);
+            free(resultado);
             return false;
         }
     } else {
@@ -196,23 +195,21 @@ bool logaritmo(lista_t* lista_operaciones) {
     return true;
 }
 
-bool ternario(lista_t* lista_operaciones) {
-    if (lista_largo(lista_operaciones) >= 3) {
-        char* p;
-        p = malloc(sizeof(int));
-        if(p == NULL) {
+bool ternario(pila_t* pila_operaciones) {
+    if (pila_largo(pila_operaciones) >= 3) {
+        int* resultado = malloc(sizeof(int));
+        if(resultado == NULL) {
             return false;
         }
-        void* a = lista_borrar_primero(lista_operaciones);
-        void* b = lista_borrar_primero(lista_operaciones);
-        void* c = lista_borrar_primero(lista_operaciones);
-        int resultado = atoi(a) != 0 ? atoi(b) : atoi(c);
-        sprintf(p,"%d",resultado);
-        lista_insertar_primero(lista_operaciones, p);
-        free(a);
-        free(b);
-        free(c);
-            
+        int* comparacion = pila_desapilar(pila_operaciones);
+        int* valor_si_verdadero = pila_desapilar(pila_operaciones);
+        int* valor_si_falso = pila_desapilar(pila_operaciones);
+        *resultado = *comparacion != 0 ? *valor_si_verdadero : *valor_si_falso;
+        pila_apilar(pila_operaciones, resultado);
+        free(comparacion);
+        free(valor_si_verdadero);
+        free(valor_si_falso);
+
     } else {
         return false;
     }
@@ -220,52 +217,64 @@ bool ternario(lista_t* lista_operaciones) {
 }
 
 int dc() {
-    lista_t* lista_operaciones = lista_crear();
-    if (lista_operaciones == NULL) {
+    pila_t* pila_operaciones = pila_crear();
+    if (pila_operaciones == NULL) {
         return 1;
-    }    
+    }
     char* linea = NULL;
     size_t capacidad = 0;
     while (getline(&linea, &capacidad, stdin) != EOF) {
+        bool resultado_ok = true;
         char** lista = split(linea, ' ');
         size_t indice_lista = 0;
-        bool resultado_ok = true;
-        while (lista[indice_lista] != NULL) {
+        while (lista[indice_lista] != NULL && resultado_ok) {
             void* elemento = lista[indice_lista];
-            if((atoi((char*)elemento) == 0 && strcmp((char*)elemento,"0") == 0) || (atoi((char*)elemento) != 0)) {
-                lista_insertar_primero(lista_operaciones, lista[indice_lista]);
+            if((atoi((char*)elemento) == 0 && (strcmp((char*)elemento,"0") == 0 || strcmp((char*)elemento,"0\\n") == 0)) || (atoi((char*)elemento) != 0)) {
+                int* numero = malloc(sizeof(int));
+                if(numero == NULL) {
+                    fprintf(stdout, "ERROR\n");
+                    return 1;
+                }
+                *numero = atoi(elemento);
+                pila_apilar(pila_operaciones, numero);
             } else if (*(char*)elemento == SUMA) {
-                resultado_ok = suma(lista_operaciones);                
+                resultado_ok = suma(pila_operaciones);
             } else if (*(char*)elemento == RESTA) {
-                resultado_ok = resta(lista_operaciones);                
+                resultado_ok = resta(pila_operaciones);
             } else if (*(char*)elemento == POTENCIA) {
-                resultado_ok = potencia(lista_operaciones);                
+                resultado_ok = potencia(pila_operaciones);
             } else if (*(char*)elemento == DIVISION) {
-                resultado_ok = division(lista_operaciones);
+                resultado_ok = division(pila_operaciones);
             } else if (*(char*)elemento == MULTIPLICACION) {
-                resultado_ok = multiplicacion(lista_operaciones);
+                resultado_ok = multiplicacion(pila_operaciones);
             } else if (*(char*)elemento == TERNARIO) {
-                resultado_ok = ternario(lista_operaciones);
+                resultado_ok = ternario(pila_operaciones);
             } else if (strcmp((char*)elemento, RAIZ) == 0 || strcmp((char*)elemento, RAIZ_FINAL_LINEA) == 0) {
-                resultado_ok = raiz(lista_operaciones);
+                resultado_ok = raiz(pila_operaciones);
             } else if (strcmp((char*)elemento, LOG) == 0 || strcmp((char*)elemento, LOG_FINAL_LINEA) == 0) {
-                resultado_ok = logaritmo(lista_operaciones);
-            } else {
+                resultado_ok = logaritmo(pila_operaciones);
+            } else if (strlen((char*)elemento) > 0 && strcmp((char*)elemento, "\\n") != 0 && strcmp((char*)elemento, "\\n\n") != 0 && strcmp((char*)elemento, "\n") != 0) {
                 resultado_ok = false;
             }
             indice_lista++;
-            free(elemento);
-        }        
+        }
+        if (pila_largo(pila_operaciones) > 1 || indice_lista == 1) {
+            resultado_ok = false;
+            while (pila_largo(pila_operaciones) > 1) {
+                int* valor = pila_desapilar(pila_operaciones);
+                free(valor);
+            }
+        }
+        int* valor = pila_desapilar(pila_operaciones);
         if (resultado_ok) {
-            void* valor = lista_borrar_primero(lista_operaciones);
-            fprintf(stdout, "%d\n", atoi(valor));            
-            free(valor);
+            fprintf(stdout, "%i\n", *valor);
         } else {
             fprintf(stdout, "ERROR\n");
         }
-        free(lista);
+        free(valor);
+        free_strv(lista);
     }
-    lista_destruir(lista_operaciones, free);
+    pila_destruir(pila_operaciones);
     free(linea);
     return 0;
 }

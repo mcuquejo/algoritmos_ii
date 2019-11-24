@@ -1,2 +1,2 @@
-grep: grep.c lista.c strutil.c
-dc: dc.c lista.c strutil.c
+grep: grep.c cola.c strutil.c
+dc: dc.c pila.c strutil.c

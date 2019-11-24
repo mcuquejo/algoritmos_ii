@@ -2,21 +2,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "lista.h"
+#include "cola.h"
 #include "strutil.h"
 
 char* strdup (const char* s) {
-	char* dup = malloc(strlen (s)+1);
-	if (dup == NULL)
-		return NULL;
-  strcpy(dup,s);
-	return dup;
+    char* dup = malloc(strlen (s) + 1);
+    if (dup == NULL)
+        return NULL;
+    strcpy(dup,s);
+    return dup;
 }
 
-size_t fnv_hash(const char *clave, size_t largo){
+size_t fnv_hash(const char *clave, size_t largo) {
     size_t h = 14695981039346656037U;
     size_t n = strlen(clave);
-    for (size_t i = 0; i < n; i++){
+    for (size_t i = 0; i < n; i++) {
         h *= 1099511628211;
         h ^= (size_t)clave[i];
     }
@@ -43,75 +43,75 @@ void* rabin_karp(char* s, char* pattern) {
 }
 
 int procesar_archivo(char* cadena, int n, char* arch) {
-    FILE* archivo = fopen(arch ,"r");
+    FILE* archivo = fopen(arch,"r");
     if (archivo == NULL) {
         fprintf(stderr, "No se pudo abrir el archivo\n");
         return 1;
-    }    
-    lista_t* buffer = lista_crear();
+    }
+    cola_t* buffer = cola_crear();
     if (buffer == NULL) {
         fprintf(stderr, "Falló la creación del buffer\n");
         return 1;
-    }    
+    }
     char* linea = NULL;
     size_t capacidad = 0;
     size_t cont_contexto = 0;
     while (getline(&linea, &capacidad, archivo) != EOF) {
         if (strlen(linea) > 0) {
             char* linea_aux = strdup(linea);
-            lista_insertar_ultimo(buffer, linea_aux);
+            cola_encolar(buffer, linea_aux);
         }
         cont_contexto++;
         if (cont_contexto > n + 1) {
-            void* linea_aux = lista_borrar_primero(buffer);
+            void* linea_aux = cola_desencolar(buffer);
             free(linea_aux);
-        }        
+        }
         char* coincidencia = rabin_karp(linea, cadena);
-        if (coincidencia != NULL){
-            while (lista_esta_vacia(buffer) == false) {
-                void* linea_aux = lista_borrar_primero(buffer);
-                    fprintf(stdout, "%s", (char*)linea_aux);
-                    free(linea_aux);
-                    cont_contexto = 0;
+        if (coincidencia != NULL) {
+            while (cola_esta_vacia(buffer) == false) {
+                void* linea_aux = cola_desencolar(buffer);
+                fprintf(stdout, "%s", (char*)linea_aux);
+                free(linea_aux);
+                cont_contexto = 0;
             }
-        }        
+        }
     }
-    lista_destruir(buffer, free);
+    cola_destruir(buffer, free);
     free(linea);
     fclose(archivo);
     return 0;
 }
 
 int procesar_stdin(char* cadena, int n) {
-    lista_t* buffer = lista_crear();
+    cola_t* buffer = cola_crear();
     if (buffer == NULL) {
         fprintf(stderr, "Falló la creación del buffer\n");
         return 1;
-    }    
+    }
     char* linea = NULL;
     size_t capacidad = 0;
     size_t cont_contexto = 0;
     while (getline(&linea, &capacidad, stdin) != EOF) {
         if (strlen(linea) > 0) {
             char* linea_aux = strdup(linea);
-            lista_insertar_ultimo(buffer, linea_aux);
+            cola_encolar(buffer, linea_aux);
         }
         cont_contexto++;
         if (cont_contexto > n + 1) {
-            void* linea_aux = lista_borrar_primero(buffer);
+            void* linea_aux = cola_desencolar(buffer);
             free(linea_aux);
-        }        
+        }
         char* coincidencia = rabin_karp(linea, cadena);
-        if (coincidencia != NULL){
-            while (lista_esta_vacia(buffer) == false) {
-                void* linea_aux = lista_borrar_primero(buffer);
-                    fprintf(stdout, "%s", (char*)linea_aux);
-                    free(linea_aux);
-                    cont_contexto = 0;
+        if (coincidencia != NULL) {
+            while (cola_esta_vacia(buffer) == false) {
+                void* linea_aux = cola_desencolar(buffer);
+                fprintf(stdout, "%s", (char*)linea_aux);
+                free(linea_aux);
+                cont_contexto = 0;
             }
-        }        
+        }
     }
-    lista_destruir(buffer, free);
+    cola_destruir(buffer, free);
     free(linea);
     return 0;
 }
@@ -133,11 +133,11 @@ int main(int argc, char *argv[]) {
     if(argc <= 2 || argc > 4) {
         fprintf(stderr, "Cantidad de parametros erronea\n");
         return 1;
-    }    
+    }
     if (argc == 4) {
         grep(argv[1], atoi(argv[2]), argv[3]);
     } else if (argc == 3) {
         grep(argv[1], atoi(argv[2]), "");
-    }    
+    }
     return 0;
 }
